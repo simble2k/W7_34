@@ -6,10 +6,27 @@
 #include <cstring>
 using namespace std;
 
-void inputCourse(Course &c, Student list[], const char filename[]){
+void deleteCourse(Course &c) {
+    if (c.list != nullptr) {
+        delete[] c.list;
+        c.list = nullptr;
+    }
+    if (c.id != nullptr) {
+        delete[] c.id;
+        c.id = nullptr;
+    }
+    if (c.name != nullptr) {
+        delete[] c.name;
+        c.name = nullptr;
+    }
+    c.currentStudent = 0;
+}
+
+void inputCourse(Course &c, const char filename[]){
     ifstream fin(filename);
     if(!fin) return;
-
+    c.id = new char[100];
+    c.name = new char[100];
     c.currentStudent = 0;
 
     fin.get(c.id, 100);
@@ -21,8 +38,10 @@ void inputCourse(Course &c, Student list[], const char filename[]){
     fin >> c.currentStudent;
     fin.ignore();
 
+    c.list = new Student[c.currentStudent];
+
     for(int i = 0; i < c.currentStudent; i++){
-        readFromFile(fin, list[i]);
+        readFromFile(fin, c.list[i]);
     }
 
     fin >> c.open;
@@ -33,29 +52,43 @@ void inputCourse(Course &c, Student list[], const char filename[]){
     fin.close();
 }
 
-void outputCourse(const Course &c, const Student list[], const char filename[]){
+void outputCourse(const Course &c, const char filename[]){
     ofstream fout(filename);
     if(!fout) return;
     fout << "Course id: " << c.id << '\n';
     fout << "Course name: " << c.name << '\n';
     for(int i = 0; i < c.currentStudent; i++){
-        writeToFile(fout, list[i]);
+        writeToFile(fout, c.list[i]);
         fout << '\n';
     }
     fout.close();
 }
-void addStudent(Course &c, Student list[]){
-    if(c.currentStudent == c.maxStudent) cout << "Maximum number of student. Can't add more student to this course";
-    else{
-        inputStudent(list[c.currentStudent]);
+
+void addStudent(Course &c){
+    if(c.currentStudent >= c.maxStudent) {
+        cout << "Maximum number of student. Can't add more student to this course";
+    }
+    else {
+        Student* newList = new Student[c.currentStudent + 1];
+
+        for(int i = 0; i < c.currentStudent; i++) {
+            newList[i] = c.list[i];
+        }
+
+        delete[] c.list;
+
+        c.list = newList;
+
+        inputStudent(c.list[c.currentStudent]);
         c.currentStudent++;
     }
 }
-void removeStudent(Course &c, Student list[], const char id[]) {
+
+void removeStudent(Course &c, const char id[]) {
     int pos = -1;
 
     for (int i = 0; i < c.currentStudent; i++) {
-        if (list[i].id == id) {
+        if (c.list[i].id == id) {
             pos = i;
             break;
         }
@@ -67,14 +100,16 @@ void removeStudent(Course &c, Student list[], const char id[]) {
     }
 
     for (int i = pos; i < c.currentStudent - 1; i++) {
-        list[i] = list[i + 1];
+        c.list[i] = c.list[i + 1];
     }
 
     c.currentStudent--;
     cout << "Student removed successfully.\n";
     if(c.currentStudent < c.minStudent) c.open = false;
+
 }
-void studentBornThisMonth(const Course &c,const Student list[]){
+
+void studentBornThisMonth(const Course &c){
     date today;
 
     auto now = chrono::system_clock::now();
@@ -86,15 +121,16 @@ void studentBornThisMonth(const Course &c,const Student list[]){
     today.year = local->tm_year + 1900;
     int n = 0;
     for(int i = 0; i < c.currentStudent; i++){
-        if(list[i].dob.month == today.month) {
-            outputStudent(list[i]);
+        if(c.list[i].dob.month == today.month) {
+            outputStudent(c.list[i]);
             cout << '\n';
             n++;
-    }
+        }
     }
     if (n == 0) cout << "No student born in this month";
 }
-void studentBornThisDate(const Course &c, const Student list[]){
+
+void studentBornThisDate(const Course &c){
     date today;
 
     auto now = chrono::system_clock::now();
@@ -106,15 +142,16 @@ void studentBornThisDate(const Course &c, const Student list[]){
     today.year = local->tm_year + 1900;
     int n = 0;
     for(int i = 0; i < c.currentStudent; i++){
-        if(list[i].dob.month == today.month && list[i].dob.day == today.day) {
-            outputStudent(list[i]);
+        if(c.list[i].dob.month == today.month && c.list[i].dob.day == today.day) {
+            outputStudent(c.list[i]);
             cout << '\n';
             n++;
-    }
+        }
     }
     if (n == 0) cout << "No student born in this date";
 }
-void studentLegalToDrive(const Course &c, const Student list[]){
+
+void studentLegalToDrive(const Course &c){
     date today;
 
     auto now = chrono::system_clock::now();
@@ -126,38 +163,42 @@ void studentLegalToDrive(const Course &c, const Student list[]){
     today.year = local->tm_year + 1900;
     int n = 0;
     for(int i = 0; i < c.currentStudent; i++){
-        if(list[i].dob.year - today.year >= 18 && list[i].dob.month >= today.month && list[i].dob.day >= today.day) {
-            outputStudent(list[i]);
+        if(c.list[i].dob.year - today.year >= 18 && c.list[i].dob.month >= today.month && c.list[i].dob.day >= today.day) {
+            outputStudent(c.list[i]);
             cout << '\n';
             n++;
-    }
+        }
     }
     if (n == 0) cout << "No student legal to drive";
 }
-void studentInK19Class(const Course &c, const Student list[], char filename[]){
+
+void studentInK19Class(const Course &c, char filename[]){
     ofstream fout(filename);
     int n = 0;
     for(int i =0; i < c.currentStudent; i++){
-        if(getClassFromId(list[i]) == "K19"){
-            writeToFile(fout,list[i]);
+        if(getClassFromId(c.list[i]) == "K19"){
+            writeToFile(fout, c.list[i]);
             n++;
         }
     }
     if (n == 0) fout << "No student in K19 class";
     fout.close();
 }
-void findStudentByid(const Course &c, const Student list[],char id[], char filename[]){
+
+void findStudentByid(const Course &c, char id[], char filename[]){
     ofstream fout(filename);
     int n = 0;
     for(int i = 0; i < c.currentStudent; i++){
-        if(list[i].id == id){writeToFile(fout, list[i]);
-        n++;
-        break;
+        if(c.list[i].id == id){
+            writeToFile(fout, c.list[i]);
+            n++;
+            break;
         }
     }
     if(n == 0) fout << "Student not found";
     fout.close();
 }
+
 bool isSubStr(string s1, char s2[]) {
     int n = s1.size();
     int m = strlen(s2);
@@ -172,69 +213,74 @@ bool isSubStr(string s1, char s2[]) {
 
     return false;
 }
-void findStudentByName(const Course &c, const Student list[], char name[], char filename[]){
+
+void findStudentByName(const Course &c, char name[], char filename[]){
     ofstream fout(filename);
     int n = 0;
     for(int i = 0; i < c.currentStudent; i++){
-        if (isSubStr(list[i].fullname,name)){
-            writeToFile(fout,list[i]);
+        if (isSubStr(c.list[i].fullname, name)){
+            writeToFile(fout, c.list[i]);
             n++;
         }
     }
     if(n == 0) fout << "Student not found!";
     fout.close();
 }
-void sortStudentById(const Course &c,Student list[],char filename[]){
+
+void sortStudentById(const Course &c, char filename[]){
     ofstream fout(filename);
     for(int i = 0; i < c.currentStudent - 1; i++){
         for(int j = i + 1; j < c.currentStudent; j++){
-            if(list[i].id > list[j].id) swap(list[i],list[j]);
+            if(c.list[i].id > c.list[j].id) swap(c.list[i], c.list[j]);
         }
    }
    for(int i = 0; i < c.currentStudent; i++){ 
-        writeToFile(fout,list[i]);
+        writeToFile(fout, c.list[i]);
         fout << '\n';
    }
    fout.close();
 }
-void sortStudentByFirstName(const Course &c, Student list[], char filename[]){
+
+void sortStudentByFirstName(const Course &c, char filename[]){
     ofstream fout(filename);
     for(int i = 0; i < c.currentStudent - 1; i++){
         for(int j = i + 1; j < c.currentStudent; j++){
-            string first1,last1,first2,last2;
-            splitName(list[i].fullname,first1,last1);
-            splitName(list[j].fullname,first2,last2);
-            if(first1 > first2) swap(list[i],list[j]);
+            string first1, last1, first2, last2;
+            splitName(c.list[i].fullname, first1, last1);
+            splitName(c.list[j].fullname, first2, last2);
+            if(first1 > first2) swap(c.list[i], c.list[j]);
         }
    }
    for(int i = 0; i < c.currentStudent; i++){ 
-        writeToFile(fout,list[i]);
+        writeToFile(fout, c.list[i]);
         fout << '\n';
    }
    fout.close();
 }
-void sortStudentByGpa(const Course &c, Student list[],char filename[]){
+
+void sortStudentByGpa(const Course &c, char filename[]){
     ofstream fout(filename);
     for(int i = 0; i < c.currentStudent - 1; i++){
         for(int j = i + 1; j < c.currentStudent; j++){
-            if(list[i].gpa > list[j].gpa) swap(list[i],list[j]);
+            if(c.list[i].gpa > c.list[j].gpa) swap(c.list[i], c.list[j]);
         }
    }
    for(int i = 0; i < c.currentStudent; i++){ 
-        writeToFile(fout,list[i]);
+        writeToFile(fout, c.list[i]);
         fout << '\n';
    }
    fout.close();
 }
-void sortStudentByDob(const Course &c, Student list[],char filename[]){
+
+void sortStudentByDob(const Course &c, char filename[]){
     ofstream fout(filename);
     for(int i = 0; i < c.currentStudent - 1; i++){
         for(int j = i + 1; j < c.currentStudent; j++){
-            if(compareTwoDate(list[i].dob,list[j].dob) == 1) swap(list[i],list[j]);
+            if(compareTwoDate(c.list[i].dob, c.list[j].dob) == 1) swap(c.list[i], c.list[j]);
         }
    }
    for(int i = 0; i < c.currentStudent; i++){ 
-        writeToFile(fout,list[i]);
+        writeToFile(fout, c.list[i]);
         fout << '\n';
    }
    fout.close();

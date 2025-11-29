@@ -36,7 +36,7 @@ void insertEnd(node* &head){
     while(p->next != nullptr) p = p->next;
     p->next = temp;
 }
-void insertAfterNodek(node* &head){
+/* void insertAfterNodek(node* &head){
     node* temp = new node;
     cin >> temp->val;
     temp->next = nullptr;
@@ -47,6 +47,7 @@ void insertAfterNodek(node* &head){
         p = p->next;
         cnt++;
     }
+    if(cnt < k) return;
     temp->next = p->next;
     p->next = temp;
 }
@@ -55,14 +56,32 @@ void insertBeforeNodek(node* &head){
     cin >> temp->val;
     temp->next = nullptr;
     int k; cin >> k;
+    if(k == 0){
+        temp->next = head;
+        head = temp;
+    }
     int cnt = 0;
     node* p = head;
     while(p != nullptr && cnt < k - 1){
         p = p->next;
         cnt++;
     }
+    if(cnt < k - 1) return;
     temp->next = p->next;
     p->next = temp;
+} */
+void insertAfterk(node* &head){
+    node* tmp = head;
+    int k; cin >> k;
+    while(tmp->val != k){
+        if(tmp == nullptr) return;
+        tmp = tmp->next;
+    }
+    node* neu = new node;
+    int x; cin >> x;
+    neu->val = x;
+    neu->next = tmp->next;
+    tmp->next = neu;
 }
 void printList(node* &head){
     node* tmp = head;
@@ -81,6 +100,7 @@ void deleteList(node* &head){
 int main(){
     node* head = nullptr;
     input(head);
+    insertAfterk(head);
     printList(head);
     deleteList(head);
     return 0;

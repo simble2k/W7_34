@@ -27,12 +27,17 @@ void courseMenu(){
     cout << "14. Sort student by date of birth (to text file)\n";  
     cout << "\n============= Course Menu ============= \n";
 }
+
 int main(){
     Course c;
-    Student s[100];
-    char filename[100];
-    char id[100];
-    char name[100];
+    c.id = nullptr;
+    c.name = nullptr;
+    c.list = nullptr;
+    c.currentStudent = 0;
+
+    char* filename = new char[100];
+    char* id = new char[100];
+    char* name = new char[100];
 
     while(true){
         courseMenu();
@@ -43,41 +48,45 @@ int main(){
         {
         case 0:
             cout << "Exiting program. See you again!";
+            delete[] filename;
+            delete[] id;
+            delete[] name;
+            deleteCourse(c);
             return 0;
         case 1:
             cout << "Enter filename: ";
             cin.get(filename,100);
             cin.ignore();
-            inputCourse(c,s,filename);
+            inputCourse(c, filename);
             break;
         case 2:
             cout << "Enter filename: ";
             cin.get(filename,100);
             cin.ignore();
-            outputCourse(c,s,filename);
+            outputCourse(c, filename);
             break;
         case 3:
-            addStudent(c,s);
+            addStudent(c);
             break;
         case 4:
             cout << "Enter ID to remove: ";
             cin >> id;
-            removeStudent(c, s, id);
+            removeStudent(c, id);
             break;
         case 5:
-            studentBornThisMonth(c,s);
+            studentBornThisMonth(c);
             break;
         case 6:
-            studentBornThisDate(c,s);
+            studentBornThisDate(c);
             break;
         case 7:
-            studentLegalToDrive(c,s);
+            studentLegalToDrive(c);
             break;
         case 8:
             cout << "Enter filename: ";
             cin.get(filename,100);
             cin.ignore();
-            studentInK19Class(c,s,filename);
+            studentInK19Class(c, filename);
             break;
         case 9:
             cout << "Enter id to find: ";
@@ -86,7 +95,7 @@ int main(){
             cout << "Enter filename: ";
             cin.get(filename,100);
             cin.ignore();
-            findStudentByid(c,s,id,filename);
+            findStudentByid(c, id, filename);
             break;
         case 10:
             cout << "Enter name to find: ";
@@ -95,31 +104,31 @@ int main(){
             cout << "Enter filename: ";
             cin.get(filename,100);
             cin.ignore();
-            findStudentByName(c,s,name,filename);
+            findStudentByName(c, name, filename);
             break;
         case 11:
             cout << "Enter filename: ";
             cin.get(filename,100);
             cin.ignore();
-            sortStudentById(c,s,filename);
+            sortStudentById(c, filename);
             break;
         case 12:
             cout << "Enter filename: ";
             cin.get(filename,100);
             cin.ignore();
-            sortStudentByFirstName(c,s,filename);
+            sortStudentByFirstName(c, filename);
             break;
         case 13:
             cout << "Enter filename: ";
             cin.get(filename,100);
             cin.ignore();
-            sortStudentByGpa(c,s,filename);
+            sortStudentByGpa(c, filename);
             break;
         case 14:
             cout << "Enter filename: ";
             cin.get(filename,100);
             cin.ignore();
-            sortStudentByDob(c,s,filename);
+            sortStudentByDob(c, filename);
             break;
         default:
             cout << "Please enter a valid option from 0 to 14";
