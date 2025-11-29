@@ -41,7 +41,7 @@
 *.dwo
 
 # build files
-/.vscode
+.vscode/
 
 #test files
 test.cpp
