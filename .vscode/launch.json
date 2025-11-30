@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "d:/local/W7_34/2.52",
-      "program": "d:/local/W7_34/2.52/build/Debug/outDebug",
+      "cwd": "d:/local/W7_34/2.54",
+      "program": "d:/local/W7_34/2.54/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

@@ -1,3 +1,6 @@
+//25125080
+//PHAM QUOC BAO
+//25A02
 #include <iostream>
 using namespace std;
 int* returnPointer(int* a, int n){
